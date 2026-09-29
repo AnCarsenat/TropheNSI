@@ -15,6 +15,27 @@ avec l'architecture actuelle et etre accompagnes de tests.
 
 - Garder dans `Node2D.Properties` les donnees du noeud : position locale, rotation,
 	echelle, visibilite et options de rendu.
+- Permettre a chaque type de node de definir des proprietes supplementaires et
+	typees. Par exemple, `Sprite2D` doit pouvoir exposer `properties.image` et accepter
+	directement le chemin du fichier image.
+- Conserver dans les scenes un chemin logique portable, avec `/` comme separateur et
+	un chemin relatif a la racine du projet. Ne jamais stocker un chemin absolu propre a
+	Windows, Linux ou macOS dans une scene.
+- Resoudre ce chemin avec `pathlib.Path` selon l'OS courant, verifier qu'il reste dans
+	la racine du projet, puis charger la ressource au moment necessaire. Le node conserve
+	le chemin logique ; le renderer recoit une ressource chargee ou un handle independant
+	du systeme de fichiers.
+	Exemple :
+
+```python
+class Sprite2D(Node2D):
+    def __init__(self, image=None, **kwargs):
+        super().__init__(**kwargs)
+        self.properties.image = image
+
+sprite = Sprite2D(image="resources/images/my_sprite.png")
+```
+
 - Ajouter `add_child()` et `remove_child()` pour maintenir automatiquement les liens
 	parent/enfant et refuser les arbres invalides.
 - Utiliser la position locale d'un noeud et calculer sa position globale a partir de
@@ -78,6 +99,15 @@ depuis le thread secondaire.
 	backend.
 - Centraliser dans le renderer la conversion des positions, rotations, echelles,
 	couleurs, textures et surfaces vers les primitives du backend.
+- Definir un registre ou un gestionnaire de ressources capable de charger, typer,
+- mettre en cache et fournir les ressources a partir d'un chemin de fichier (`.png`,
+	`.jpg`, `.wav`, `.ttf`, etc.).
+- Normaliser les separateurs, les chemins relatifs et les encodages sans modifier la
+	valeur logique declaree dans la scene, afin qu'un meme projet fonctionne sur plusieurs
+	systemes d'exploitation.
+- Permettre a une scene de declarer une ressource d'image puis de l'affecter a la
+	propriete `image` d'un `Sprite2D` avec un chemin direct, avec une erreur claire si le
+	fichier est introuvable ou si son type est incompatible.
 - Definir un point d'extension de rendu pour chaque type de noeud dessinable, sans faire
 	appel directement a Pygame depuis `Node2D`.
 - Ajouter au minimum la gestion de la taille de fenetre, du plein ecran, du redimensionnement,

@@ -92,7 +92,8 @@ depuis le thread secondaire.
 - Connecter le moteur a Pygame via un wrapper qui centralise la fenetre, les evenements,
 	le rendu, l'horloge et l'arret propre.
 - Garder les classes du coeur independantes de Pygame autant que possible en definissant
-	une interface de backend (`Renderer`, `Window` et gestionnaire d'evenements).
+	des interfaces separees : `Renderer` pour le dessin, `Window` pour la fenetre,
+	`Input` pour le clavier et la souris, et `Audio` pour les sons et la musique.
 - Permettre de remplacer Pygame par un autre backend sans modifier les scenes ni la
 	logique des noeuds.
 - Definir le pipeline de dessin d'une frame : mettre a jour les transformations globales,
@@ -185,29 +186,43 @@ window:
 
 ### Renderers envisageables
 
-Le renderer est un backend interchangeable. Tous doivent recevoir les commandes de
-dessin du moteur, gerer leur fenetre et leurs evenements, puis liberer leurs ressources
-proprement.
+Le renderer est un backend interchangeable. Il ne doit recevoir que les commandes de
+dessin du moteur. La fenetre, les evenements et l'audio peuvent provenir de bibliotheques
+distinctes ; un projet choisit donc une combinaison de backends qui declare ses
+capacites et libere correctement ses ressources.
 
-- **Pygame 2 :** choix prioritaire pour le prototype ; fenetre, clavier, souris, images,
-	sons et primitives 2D via SDL2.
-- **PySDL2 :** acces plus direct a SDL2 ; utile si le wrapper doit exposer davantage de
-	fonctionnalites natives qu'avec Pygame.
-- **pyglet :** fenetre, evenements et OpenGL ; adapte a un renderer 2D accelere.
-- **Arcade :** framework 2D construit autour de pyglet ; interessant pour les sprites,
-	mais plus impose qu'un backend bas niveau.
-- **PyOpenGL ou ModernGL :** rendu OpenGL personnalise ; puissant, mais necessite de
-	gerer soi-meme les buffers, shaders, textures et conversions de coordonnees.
-- **Tkinter Canvas :** rendu 2D simple pour des outils, editeurs ou prototypes, avec
-	des performances et des transformations limitees.
-- **cairo ou pycairo :** rendu vectoriel 2D et export vers des surfaces ou fichiers ;
-	utile pour des interfaces et des images, moins adapte a une boucle de jeu complete.
-- **Terminal ASCII ou backend headless :** rendu sans fenetre pour les tests, le debug,
-	les serveurs et les environnements sans affichage.
+- **Pygame 2 :** choix prioritaire pour le prototype ; fournit une fenetre, les
+	evenements clavier/souris, le rendu 2D, les images et l'audio via SDL2. Les touches
+	doivent etre converties en evenements generiques `Input`.
+- **PySDL2 :** acces direct a SDL2 ; `SDL_Event` fournit les evenements clavier et
+	souris, tandis que `SDL_mixer` ou une couche audio SDL gere les sons et la musique.
+	Le rendu peut utiliser SDL2 directement ou etre remplace par OpenGL.
+- **pyglet :** gere fenetre, clavier, souris, audio et contexte OpenGL ; adapte a un
+	renderer 2D accelere.
+- **Arcade :** framework 2D construit autour de pyglet ; fournit deja des abstractions
+	pour les sprites, les evenements et le son, mais impose davantage son architecture.
+- **PyOpenGL ou ModernGL :** fournissent uniquement l'acces au rendu OpenGL. Ils ne
+	recuperent pas les touches et ne jouent pas les sons seuls : les evenements doivent
+	venir d'une fenetre SDL2, GLFW, pyglet ou equivalente, et l'audio d'un module comme
+	SDL_mixer, pyglet ou pygame.mixer.
+- **Tkinter Canvas :** fournit le dessin et les evenements via `bind()` ; il faut une
+	bibliotheque separee pour l'audio, et les transformations sont limitees.
+- **cairo ou pycairo :** fournit le rendu vectoriel, mais ni fenetre, ni clavier,
+	souris, ni audio. Il doit etre combine avec Tkinter, SDL2 ou une autre couche.
+- **Terminal ASCII ou backend headless :** peut recevoir des entrees terminal ou des
+	evenements simules pour les tests ; il ne fournit pas de sortie audio par defaut.
+
+Combinaisons recommandees :
+
+- `Pygame 2` pour un jeu 2D simple avec fenetre, input, audio et rendu reunis ;
+- `PySDL2 + ModernGL` pour le rendu OpenGL avec fenetre, clavier, souris et audio SDL2 ;
+- `pyglet` seul pour une solution OpenGL/2D disposant deja de l'input et de l'audio ;
+- `cairo + Tkinter` pour un outil 2D ou un editeur, avec une bibliotheque audio ajoutee
+	seulement si necessaire.
 
 Le premier backend a implementer est Pygame. Les autres restent des extensions possibles
-tant qu'ils respectent la meme interface de renderer et ne contaminent pas le coeur du
-moteur.
+tant qu'ils respectent les interfaces `Renderer`, `Input` et `Audio` sans contaminer le
+coeur du moteur.
 
 **Validation :** lancer un projet avec `main.py` seul, lancer un projet avec manifeste,
 charger une scene explicitement depuis un autre repertoire courant et verifier qu'un

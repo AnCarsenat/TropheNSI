@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from .color import Color3, Color4
-    from .math.vec2 import Vec2
+    from ..color import Color3, Color4
+    from ..math.vec2 import Vec2
 
 
 
@@ -21,7 +21,7 @@ class Node2D:
         children: list[Node2D] | None = None,
         properties: Properties | None = None,
     ):
-        from .math.vec2 import Vec2
+        from ..math.vec2 import Vec2
         if pos is None:
             pos = Vec2(0,0)
         

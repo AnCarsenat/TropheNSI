@@ -1,7 +1,7 @@
 from math import atan, tan
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from .math.vec2 import Vec2
+    from ..math.vec2 import Vec2
 
 from .node2d import Node2D
 class Camera(Node2D):

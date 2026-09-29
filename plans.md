@@ -44,10 +44,12 @@ sprite = Sprite2D(image="resources/images/my_sprite.png")
 **Validation :** tester l'ajout, le retrait, les parents invalides et le calcul de la
 position globale sur au moins deux niveaux de profondeur.
 
-## 2. Boucle du jeu
+## 2. Validation de la boucle du jeu
 
-**Validation :** utiliser un faux noeud qui enregistre les appels et verifier la valeur
-de `delta_time`, l'ordre de propagation et l'absence d'etat partage entre deux jeux.
+- Tester `Game.tick(delta_time)` avec une scene et des faux noeuds qui enregistrent les
+	appels.
+- Verifier la valeur de `delta_time`, l'ordre de propagation et l'absence d'etat partage
+	entre deux instances de `Game`.
 
 ## 3. Scenes, scripts et communication
 
@@ -100,7 +102,7 @@ depuis le thread secondaire.
 - Centraliser dans le renderer la conversion des positions, rotations, echelles,
 	couleurs, textures et surfaces vers les primitives du backend.
 - Definir un registre ou un gestionnaire de ressources capable de charger, typer,
-- mettre en cache et fournir les ressources a partir d'un chemin de fichier (`.png`,
+	mettre en cache et fournir les ressources a partir d'un chemin de fichier (`.png`,
 	`.jpg`, `.wav`, `.ttf`, etc.).
 - Normaliser les separateurs, les chemins relatifs et les encodages sans modifier la
 	valeur logique declaree dans la scene, afin qu'un meme projet fonctionne sur plusieurs
@@ -125,6 +127,10 @@ Un projet doit pouvoir etre lance depuis un simple `main.py` ou depuis un dossie
 structure. Le moteur ne doit pas imposer l'utilisation d'un manifeste ni d'un format de
 scene : le code du projet peut creer les noeuds, appeler `load_scene()` ou charger les
 ressources de la maniere la plus adaptee au jeu.
+
+La racine d'un projet est le dossier contenant `main.py` ou `projet.yaml`. Tous les
+chemins de ressources et de scenes sont relatifs a cette racine, quel que soit le
+repertoire courant depuis lequel le projet est lance.
 
 ### Modes de projet acceptes
 
@@ -155,8 +161,8 @@ mon_projet/
 	permettre de choisir explicitement un autre fichier ou module.
 - Si `projet.yaml` est present, il peut definir `title`, `version`, `entry_scene`, les
 	options de fenetre, le renderer, les ressources et les options de debug.
-- Resoudre les chemins du manifeste relativement au dossier du projet et refuser les
-	chemins qui sortent de ce dossier.
+- Resoudre tous les chemins du projet relativement a sa racine et refuser les chemins
+	qui sortent de ce dossier.
 - Valider le manifeste avant son utilisation, avec des erreurs indiquant le fichier et
 	la propriete fautive.
 - Ne jamais charger automatiquement une scene lorsque le projet est pilote par `main.py`:
@@ -204,8 +210,8 @@ tant qu'ils respectent la meme interface de renderer et ne contaminent pas le co
 moteur.
 
 **Validation :** lancer un projet avec `main.py` seul, lancer un projet avec manifeste,
-charger une scene explicitement et verifier qu'un backend headless permet de tester la
-logique sans ouvrir de fenetre.
+charger une scene explicitement depuis un autre repertoire courant et verifier qu'un
+backend headless permet de tester la logique sans ouvrir de fenetre.
 
 ## 7. Qualite, distribution et documentation
 

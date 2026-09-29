@@ -53,7 +53,7 @@ BG_BRIGHT_MAGENTA = "\033[105m"
 BG_BRIGHT_CYAN = "\033[106m"
 BG_BRIGHT_WHITE = "\033[107m"
 
-class colors:
+class ascii_colors:
 	RESET = RESET
 	BOLD = BOLD
 	DIM = DIM

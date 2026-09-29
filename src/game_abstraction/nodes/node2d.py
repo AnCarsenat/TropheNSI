@@ -31,6 +31,18 @@ class Node2D:
         self.children = children if children is not None else []
         self.game = None
 
+    def add_child(self, child:Node2D)->None:
+        self.children.append(child)
+
+    def wait_for_child(self, childName:str, maxWaitTime:float=5.0)->Node2D:
+        ...
+        #Tries find first child then waits until a new child is added.
+        #Holds execution until found with a max hold of 5 seconds
+
+    def find_first_child(self, childName:str)->Node2D:
+        ...
+        #Returns first child None if not found
+
     def _set_game(self, game):
         self.game = game
         for child in self.children:

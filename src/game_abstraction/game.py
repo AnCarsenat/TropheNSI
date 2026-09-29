@@ -8,6 +8,16 @@ class Game:
         self.debugging = False
         if "debugging" in flags:
             self.debugging = True
+
+    @property
+    def current_scene(self):
+        return self._current_scene
+
+    @current_scene.setter
+    def current_scene(self, scene):
+        self._current_scene = scene
+        if scene is not None:
+            scene._set_game(self)
         
     
     def tick(self, delta_time:float)->None:

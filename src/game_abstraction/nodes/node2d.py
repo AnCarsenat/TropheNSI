@@ -29,3 +29,9 @@ class Node2D:
         self.properties.pos = pos
         self.parent = parent
         self.children = children if children is not None else []
+        self.game = None
+
+    def _set_game(self, game):
+        self.game = game
+        for child in self.children:
+            child._set_game(game)

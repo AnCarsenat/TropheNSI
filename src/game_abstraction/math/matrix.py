@@ -1,5 +1,5 @@
 class Matrix:
-    def __init__(self, dims: int, value: int | float = 0):
+    def __init__(self, dims: int, value=None):
         if dims < 0:
             raise ValueError("dims must be >= 0")
         self.dims = dims
@@ -42,6 +42,23 @@ class Matrix:
 
         self.data[row][col] = value
 
+    @property
+    def beautiful_str(self):
+        match self.dims:
+            case 0:
+                #XXX
+                return "Matrix has 0 dimensions :3"
+            case 1:
+                return "".join(str(cell) for cell in self.data[0])
+            case 2:
+                return "\n".join(" ".join(str(cell) for cell in row) for row in self.data)
+            case 3:
+                #!nothing
+                return "Matrix is 3 dimensional"
+            case _:
+                return "Matrix has >3 dimensions"
+
+
 if __name__ == "__main__":
     m = Matrix(2, 1)
     print(m)
@@ -49,3 +66,5 @@ if __name__ == "__main__":
     m[1, 1] = 7
     print(m)
     print(len(m))
+
+    print(m.beautiful_str)
